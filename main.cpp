@@ -1,64 +1,36 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <iomanip>
 #include <sstream>
+#include "Utils.hpp"
 
 using namespace std;
 
 int main(){
+	string input_file = "data.txt";
 	double S;
-	int n;
+	size_t n;
+	double *ptr_w = nullptr;
+	double *ptr_r = nullptr;
 	
-	ifstream inputFile("data.txt");
-	if (!inputFile){
-		cerr << "Impossibile aprire il file di input" << endl;
+	if(!import_data(input_file, S, n, ptr_w, ptr_r)){
+		cerr << "Impossibile aprire il file" << input_file << endl;
 		return 1;
 	}
-	string line;
 	
-	getline(inputFile, line);
-	stringstream ss1(line);
-	string temp;
-	getline(ss1, temp, ';');
-	ss1 >> S;
+	double V = valore_finale(S, n, ptr_w, ptr_r);
+	double R = tasso_tot(S, V);
 	
-	getline(inputFile, line);
-	stringstream ss2(line);
-	getline(ss1, temp, ';');
-	ss2 >> n;
+	string output_str = final_result(S, n, ptr_w, ptr_r, R, V);
+	cout << output_str << endl;
 	
+	delete [] ptr_w;
+	delete [] ptr_r;
 	
-	vector<double> w(n);
-	vector<double> r(n);
-	
-	getline(inputFile,line);
-	
-	for(int i = 0; i < n; ++i){
-		getline(inputFile, line);
-		stringstream ss(line);
-		string w_str, r_str;
-		getline(ss, w_str, ';');
-		getline(ss, r_str, ';');
-		w[i] = stod(w_str);
-		r[i] = stod(r_str);
-	}
-	
-	double R = 0;
-	for (int i = 0; i < n; ++i){
-		R += w[i] * r[i];
-	}
-	double V = S * (1+ R);
-	
-	ofstream outputFile("result.txt");
-	if (!outputFile){
+	string outputFile("result.txt");
+	if (!esporta_data(output_file, output_str)){
 		cerr << "Impossibile aprire il file di output" << endl;
-		return 1;
+		return 2;
 	}
-	outputFile << "Il rendimento del portafoglio vale:" << R << "%" << endl;
-	outputFile << "Il valore finale del portfolio è di:" << V << endl;
-	
-	inputFile.close();
-	outputFile.close();
-
     return 0;
 }
