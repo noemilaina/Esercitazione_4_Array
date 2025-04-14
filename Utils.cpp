@@ -8,42 +8,113 @@ using namespace std;
 
 bool import_data(const string& file_path, double& S, size_t& n, double*& w, double*& r)
 {
-	ifstream ifile(file_path)
+	ifstream ifile(file_path);
 	if(ifile.fail())
 		return false;
 	
-	char c;
-	ifile>>c;
-	ifile>>c;
-	ifile>>S;
-	
-	ifile>>c;
-	ifile>>c;
-	ifile>>n;
-	
-	ifile>>c;
-	
-	string tmp;
-	getline(ifile, tmp);
+	string line;
+	// Leggo riga con S
+	if (getline(ifile, line)){
+		stringstream ss(line);
+		string key;
+		string value_str;
+		getline(ss, key, ';');
+		getline(ss, value_str, ';');
+		if (key == "S"){
+			try {
+				S = stod(value_str);
+			} catch (const std::invalid_argument& e){
+				cerr << "Errore nella lettura di S:" << e.what() << endl;
+				ifile.close();
+				return false;
+			} catch (const std::out_of_range& e){
+				cerr << "Valore di S fuori range" << e.what() << endl;
+				ifile.close();
+				return false;
+			}
+		}else{
+			cerr << "Formato file non valido" << endl;
+			ifile.close();
+				return false;
+		}
+	}else {
+			cerr << "Errore nella lettura del file" << endl;
+			ifile.close();
+			return false;
+		}
+	}
+	// Leggo riga con n	
+	if (getline(ifile,line)){
+		stringstream ss(line);
+		string key;
+		string value_str;
+		getline(ss, key, ';');
+		getline(ss, value_str, ';');
+		if (key == "n"){
+			try{
+				n = stoul(value_str);
+			}catch (const std::invalid_argument& e){
+				cerr << "Errore nella lettura di n:" << e.what() << endl;
+				ifile.close();
+				return false;
+			}catch (const std::out_of_range& e){
+				cerr << "Valore fuori range" << e.what() << endl;
+				ifile.close();
+				return false;	
+			}
+		}else{
+			cerr << "Formato file non valido" << endl;
+			ifile.close();
+			return false;
+		}
+	} else{
+		cerr << "Errore nella lettura del file" << endl;
+		ifile.close();
+		return false;
+	}
+	//Leggi e ignora l'intestazione
+	getline(ifile, line);
 	
 	w = new double[n];
 	r = new double[n];
-	
-	string line;
-	unsigned int i=0;
-	for(; getline(ifile, line); ++i){
-		stringstream ss_line(line);
-		string data;
-		double val;
-		unsigned int j=0;
-		for (; getline(ss_line, data, ';'); ++j){
-			val = stod(data);
-			if(j==0) 
-				w[i]=val;
-			else 
-				r[i]=val;
+
+	for(size_t i=0; i<n; ++i){
+		if (getline(ifile, line)){
+			stringstream ss(line);
+			string w_str, r_str;
+			if(getline(ss, w_str, ';') && getline(ss, r_str, ';')){
+				try{
+					w[i] = stod(w_str);
+					r[i] = stod(r_str);
+				} catch (const std::invalid_argument& e){
+					cerr << "Errore nella conversione a double nella riga" << i + 4 << ":" << e.what() << endl;
+					delete[] w;
+					delete[] r;
+					ifile.close();
+					return false;
+				}catch(const std::out_of_range& e){
+					cerr << "Valore fuori range nella riga" << i+4 << ":" << e.what() << endl;
+					delete[] w;
+					delete[] r;
+					ifile.close();
+					return false;
+				}
+			}else{
+				cerr << "Formato errato nella riga" << i+4 << ":attesi due valori separati da ';'" << endl;
+				delete[] w;
+				delete[] r;
+				ifile.close();
+				return false;
+			}
+		}else{
+			cerr << "Errore nella lettura dei dati w e r: file troppo corto" << endl;
+			delete[] w;
+			delete[] r;
+			ifile.close();
+			return false;
 		}
 	}
+	ifile.close();
 	return true;
 }
 
@@ -53,9 +124,9 @@ double tasso_tot(const double& S, const double& V){
 }
 
 double valore_finale(const double& S, const size_t n, const double* const& w, const double* const& r){
-	double V = 0;
-	for(unsigned int i=0; i<n; i++){
-		V +=(1+r[i])*(S*w[i]);
+	double V = S;
+	for(size_t i=0; i<n; i++){
+		V += (1 + r[i])*(S*w[i]);
 	}
 	return V;
 }
@@ -79,7 +150,7 @@ string final_result(const double& S, const size_t& n, const double* const& w, co
 		ss_output << r[i] << ' ';
 	}
 	ss_output << ']'<<endl;
-	ss_output << "Il tasso finale del portfolio vale:" << R << endl;
+	ss_output << "Rate of return of the portfolio:" << fixed<< setprecision(4) << R << endl;
 	ss_output << "V:" << ss_V.str() << endl;
 	return ss_output.str();
 }
@@ -88,5 +159,7 @@ bool esporta_data(const string& ofile_path, const string& out_str){
 	ofstream out(ofile_path);
 	if(out.fail())
 		return false;
+	out << out_str;
+	out.flush();
 	return true;
 }
