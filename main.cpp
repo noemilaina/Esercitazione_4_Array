@@ -20,7 +20,7 @@ int main(){
 		return 1;
 	}
 	
-	double V = valore_finale(S, n, ptr_w, ptr_r);
+	double V = valore_finale(S, n, w, r);
 	double R = tasso_tot(S, V);
 	
 	cout << "Il rendimento del portfolio vale:" << R << endl;
