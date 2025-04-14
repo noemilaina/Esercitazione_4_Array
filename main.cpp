@@ -7,13 +7,15 @@
 using namespace std;
 
 int main(){
-	string input_file = "data.txt";
+	const char* inputFile = "data.txt";
+	const char* outputFile = "result.txt"
+	
 	double S;
 	size_t n;
-	double *ptr_w = nullptr;
-	double *ptr_r = nullptr;
+	double* w = new double[n];
+	double* r = new double[n];
 
-	if(!import_data(input_file, S, n, ptr_w, ptr_r)){
+	if(!import_data(input_file, S, n, w, r)){
 		cerr << "Impossibile aprire il file" << input_file << endl;
 		return 1;
 	}
@@ -24,11 +26,11 @@ int main(){
 	cout << "Il rendimento del portfolio vale:" << R << endl;
 	cout << "Il valore finale del portfolio è di:" << V << endl;
 	
-	string output_str = final_result(S, n, ptr_w, ptr_r, R, V);
+	string output_str = final_result(S, n, w, r, R, V);
 	cout << output_str << endl;
 	
-	delete [] ptr_w;
-	delete [] ptr_r;
+	delete [] w;
+	delete [] r;
 	
 	string outputFile("result.txt");
 	if (!esporta_data(outputFile, output_str)){
