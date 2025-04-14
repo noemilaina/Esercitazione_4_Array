@@ -3,163 +3,107 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
-bool import_data(const string& file_path, double& S, size_t& n, double*& w, double*& r)
+bool import_data(const char* filename, double& S, int& n, double w[], double r[])
 {
-	ifstream ifile(file_path);
-	if(ifile.fail())
+	ifstream file(filename);
+	if(!file.is_open())
 		return false;
 	
-	string line;
+	string line, temp;
 	// Leggo riga con S
-	if (getline(ifile, line)){
-		stringstream ss(line);
-		string key;
-		string value_str;
-		getline(ss, key, ';');
-		getline(ss, value_str, ';');
-		if (key == "S"){
-			try {
-				S = stod(value_str);
-			} catch (const std::invalid_argument& e){
-				cerr << "Errore nella lettura di S:" << e.what() << endl;
-				ifile.close();
-				return false;
-			} catch (const std::out_of_range& e){
-				cerr << "Valore di S fuori range" << e.what() << endl;
-				ifile.close();
-				return false;
-			}
-		}else{
-			cerr << "Formato file non valido" << endl;
-			ifile.close();
-				return false;
-		}
-	}else {
-			cerr << "Errore nella lettura del file" << endl;
-			ifile.close();
-			return false;
-		}
-	}
+	getline(file, line);
+	stringstream ss1(line);
+	getline(ss1, temp, ';');
+	ss1 >> S;
+	
+	
 	// Leggo riga con n	
-	if (getline(ifile,line)){
-		stringstream ss(line);
-		string key;
-		string value_str;
-		getline(ss, key, ';');
-		getline(ss, value_str, ';');
-		if (key == "n"){
-			try{
-				n = stoul(value_str);
-			}catch (const std::invalid_argument& e){
-				cerr << "Errore nella lettura di n:" << e.what() << endl;
-				ifile.close();
-				return false;
-			}catch (const std::out_of_range& e){
-				cerr << "Valore fuori range" << e.what() << endl;
-				ifile.close();
-				return false;	
-			}
-		}else{
-			cerr << "Formato file non valido" << endl;
-			ifile.close();
-			return false;
-		}
-	} else{
-		cerr << "Errore nella lettura del file" << endl;
-		ifile.close();
-		return false;
-	}
+	getline(file, line);
+	stringstream ss2(line);
+	getline(ss2, temp, ';');
+	ss2 >> n; 
+	
 	//Leggi e ignora l'intestazione
-	getline(ifile, line);
+	getline(file, line);
 	
 	w = new double[n];
 	r = new double[n];
 
-	for(size_t i=0; i<n; ++i){
-		if (getline(ifile, line)){
-			stringstream ss(line);
-			string w_str, r_str;
-			if(getline(ss, w_str, ';') && getline(ss, r_str, ';')){
-				try{
-					w[i] = stod(w_str);
-					r[i] = stod(r_str);
-				} catch (const std::invalid_argument& e){
-					cerr << "Errore nella conversione a double nella riga" << i + 4 << ":" << e.what() << endl;
-					delete[] w;
-					delete[] r;
-					ifile.close();
-					return false;
-				}catch(const std::out_of_range& e){
-					cerr << "Valore fuori range nella riga" << i+4 << ":" << e.what() << endl;
-					delete[] w;
-					delete[] r;
-					ifile.close();
-					return false;
-				}
-			}else{
-				cerr << "Formato errato nella riga" << i+4 << ":attesi due valori separati da ';'" << endl;
-				delete[] w;
-				delete[] r;
-				ifile.close();
-				return false;
-			}
-		}else{
-			cerr << "Errore nella lettura dei dati w e r: file troppo corto" << endl;
-			delete[] w;
-			delete[] r;
-			ifile.close();
-			return false;
-		}
+	for(int i=0; i<n; ++i){
+		getline(file, line);
+		stringstream ss(line);
+		getline(ss, temp, ';');
+		w[i] = stod(temp);
+		getline(ss, temp, ';');
+		r[i] = stod(temp);
 	}
-	ifile.close();
+	file.close();
 	return true;
 }
 
-double tasso_tot(const double& S, const double& V){
-	double R=(V/S)-1;
-	return R;
-}
-
-double valore_finale(const double& S, const size_t n, const double* const& w, const double* const& r){
-	double V = S;
-	for(size_t i=0; i<n; i++){
+void PortfolioFinale(double S, int n, const double w[], const double r[], double& PortfolioReturn, double& V){
+	double V = 0.0;
+	for(int i=0; i < n; ++i){
 		V += (1 + r[i])*(S*w[i]);
 	}
-	return V;
+	PortfolioReturn = (V / S) - 1;
 }
 
-string final_result(const double& S, const size_t& n, const double* const& w, const double* const& r, const double& R, const double& V){
-	stringstream ss_output;
-	stringstream ss_S, ss_V;
-	ss_S<<fixed<<setprecision(2)<<S;
-	ss_V<<fixed<<setprecision(2)<<V;
+void stampaConsole(double S, int n, const double w[], const double r[], double PortfolioReturn, double V){
+	cout << fixed << setprecision(2);
+	cout << "S = " << S << ", n = " << n << endl;
 	
-	ss_output << "S=" << ss_S.str()<< ","<< "n=" << n <<endl;
-	
-	ss_output << "w = [";
-	for(unsigned int i=0; i<n; i++){
-		ss_output<<w[i]<< ' ';
+	cout << "w = [ ";
+	for (int i = 0, i < n, ++i){
+		cout << w[i] << " ";
 	}
-	ss_output<<']'<<endl;
+	cout << w[i] << " ";
 	
-	ss_output << "r = [";
-	for(unsigned int i=0; i<n; i++){
-		ss_output << r[i] << ' ';
+	cout << "r = [";
+	for (int i = 0, i < n< ++i){
+		cout << r[i] << " ";
 	}
-	ss_output << ']'<<endl;
-	ss_output << "Rate of return of the portfolio:" << fixed<< setprecision(4) << R << endl;
-	ss_output << "V:" << ss_V.str() << endl;
-	return ss_output.str();
+	cout "]" << endl;
+	
+	cout << setprecision(4);
+	cout << "Rate of return of the portfolio: " << PortfolioReturn << endl;
+	
+	cout fixed << setprecision(2);
+	cout << "V:" << V << endl;
 }
 
-bool esporta_data(const string& ofile_path, const string& out_str){
-	ofstream out(ofile_path);
-	if(out.fail())
-		return false;
-	out << out_str;
-	out.flush();
+void scriviFile(const char* filename, double S, int n, const double w[], const double r[], double PortfolioReturn, double V){
+	ofstream outFile(filename);
+	if(!outfile.is_open())
+		return true;
+	
+	outFile << fixed << setprecision(2);
+	outFile << "S =" << S << ", n = " << n << endl;
+	
+	outFile << "w = [ " ;
+	for (int i = 0, i < n, ++i){
+		outFile << w[i] << " ";
+	}
+	outFile << "]" << endl;
+	
+	outFile << "r = [ ";
+	for(int i = 0, i < n, ++i){
+		outFile << r[i] << " ";
+	}
+	outFile << "]" << endl;
+	
+	outFile << setprecision(4);
+	outFile << "Rate of return of the portfolio: " << PortfolioReturn << endl;
+	
+	outFile << fixed << setprecision(2);
+	outFile << "V: " << V << endl;
+
+	outFile.close();
+
 	return true;
 }
