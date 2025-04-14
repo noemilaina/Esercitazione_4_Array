@@ -12,7 +12,7 @@ int main(){
 	size_t n;
 	double *ptr_w = nullptr;
 	double *ptr_r = nullptr;
-	
+
 	if(!import_data(input_file, S, n, ptr_w, ptr_r)){
 		cerr << "Impossibile aprire il file" << input_file << endl;
 		return 1;
@@ -21,6 +21,9 @@ int main(){
 	double V = valore_finale(S, n, ptr_w, ptr_r);
 	double R = tasso_tot(S, V);
 	
+	cout << "Il rendimento del portfolio vale:" << R << endl;
+	cout << "Il valore finale del portfolio è di:" << V << endl;
+	
 	string output_str = final_result(S, n, ptr_w, ptr_r, R, V);
 	cout << output_str << endl;
 	
@@ -28,7 +31,7 @@ int main(){
 	delete [] ptr_r;
 	
 	string outputFile("result.txt");
-	if (!esporta_data(output_file, output_str)){
+	if (!esporta_data(outputFile, output_str)){
 		cerr << "Impossibile aprire il file di output" << endl;
 		return 2;
 	}
