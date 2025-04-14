@@ -11,7 +11,7 @@ int main(){
 	const char* outputFile = "result.txt"
 	
 	double S;
-	size_t n;
+	int n;
 	double* w = new double[n];
 	double* r = new double[n];
 
@@ -26,16 +26,11 @@ int main(){
 	cout << "Il rendimento del portfolio vale:" << R << endl;
 	cout << "Il valore finale del portfolio è di:" << V << endl;
 	
-	string output_str = final_result(S, n, w, r, R, V);
-	cout << output_str << endl;
+	printTo
 	
 	delete [] w;
 	delete [] r;
 	
-	string outputFile("result.txt");
-	if (!esporta_data(outputFile, output_str)){
-		cerr << "Impossibile aprire il file di output" << endl;
-		return 2;
-	}
+	
     return 0;
 }
