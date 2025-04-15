@@ -7,11 +7,12 @@
 
 using namespace std;
 
-bool import_data(const char* filename, double& S, int& n, double w[], double r[])
+bool import_data(const char* filename, double& S, int& n, double* w, double* r)
 {
 	ifstream file(filename);
-	if(!file.is_open())
+	if(!file.is_open()){
 		return false;
+	}
 	
 	string line, temp;
 	// Leggo riga con S
@@ -45,7 +46,7 @@ bool import_data(const char* filename, double& S, int& n, double w[], double r[]
 	return true;
 }
 
-void PortfolioFinale(double S, int n, const double w[], const double r[], double& PortfolioReturn, double& V){
+void PortfolioFinale(double* w, double* r, int n, double S, double& PortfolioReturn, double& V){
 	V = 0.0;
 	for(int i=0; i < n; ++i){
 		V += (1 + r[i])*(S*w[i]);
@@ -53,7 +54,7 @@ void PortfolioFinale(double S, int n, const double w[], const double r[], double
 	PortfolioReturn = (V / S) - 1;
 }
 
-void stampaConsole(double S, int n, const double w[], const double r[], double PortfolioReturn, double V){
+void stampaConsole(double S, int n, const double* w, const double* r, double PortfolioReturn, double V){
 	cout << fixed << setprecision(2);
 	cout << "S = " << S << ", n = " << n << endl;
 	
@@ -76,10 +77,12 @@ void stampaConsole(double S, int n, const double w[], const double r[], double P
 	cout << "V:" << V << endl;
 }
 
-void scriviFile(const char* filename, double S, int n, const double w[], const double r[], double PortfolioReturn, double V){
+void scriviFile(const char* filename, double S, int n, const double* w, const double* r, double PortfolioReturn, double V){
 	ofstream outFile(filename);
-	if(!outFile.is_open()) return;
-	
+	if(!outFile.is_open()) {
+		cerr << "Impossibile aprire il file" << filename << endl;
+		return;
+	}
 	outFile << fixed << setprecision(2);
 	outFile << "S =" << S << ", n = " << n << endl;
 	
