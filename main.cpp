@@ -12,6 +12,7 @@ int main(){
 	
 	double S;
 	int n;
+	
 	double* w = new double[n];
 	double* r = new double[n];
 
