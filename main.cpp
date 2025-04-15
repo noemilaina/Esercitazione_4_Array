@@ -8,25 +8,25 @@ using namespace std;
 
 int main(){
 	const char* inputFile = "data.txt";
-	const char* outputFile = "result.txt"
+	const char* outputFile = "result.txt";
 	
 	double S;
 	int n;
 	double* w = new double[n];
 	double* r = new double[n];
 
-	if(!import_data(input_file, S, n, w, r)){
-		cerr << "Impossibile aprire il file" << input_file << endl;
+	if(!import_data(inputFile, S, n, w, r)){
+		cerr << "Impossibile aprire il file" << inputFile << endl;
 		return 1;
 	}
 	
-	double V = valore_finale(S, n, w, r);
-	double R = tasso_tot(S, V);
+	double PortfolioReturn, V = 0.0;
+	PortfolioFinale(w, r, n, S, PortfolioReturn, V);
 	
-	cout << "Il rendimento del portfolio vale:" << R << endl;
+	cout << "Il rendimento del portfolio vale:" << PortfolioReturn << endl;
 	cout << "Il valore finale del portfolio è di:" << V << endl;
 	
-	printTo
+	scriviFile(outputFile, S, n, w, r, PortfolioReturn, V);
 	
 	delete [] w;
 	delete [] r;
