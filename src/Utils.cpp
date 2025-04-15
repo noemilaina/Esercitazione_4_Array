@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <sstream>
 #include <string>
 
 using namespace std;
@@ -34,7 +33,7 @@ bool import_data(const char* filename, double& S, int& n, double w[], double r[]
 	w = new double[n];
 	r = new double[n];
 
-	for(int i=0; i<n; ++i){
+	for(int i=0; i < n; ++i){
 		getline(file, line);
 		stringstream ss(line);
 		getline(ss, temp, ';');
@@ -47,7 +46,7 @@ bool import_data(const char* filename, double& S, int& n, double w[], double r[]
 }
 
 void PortfolioFinale(double S, int n, const double w[], const double r[], double& PortfolioReturn, double& V){
-	double V = 0.0;
+	V = 0.0;
 	for(int i=0; i < n; ++i){
 		V += (1 + r[i])*(S*w[i]);
 	}
@@ -59,40 +58,39 @@ void stampaConsole(double S, int n, const double w[], const double r[], double P
 	cout << "S = " << S << ", n = " << n << endl;
 	
 	cout << "w = [ ";
-	for (int i = 0, i < n, ++i){
+	for (int i = 0; i < n; ++i){
 		cout << w[i] << " ";
 	}
-	cout << w[i] << " ";
+	cout << "]" << " ";
 	
 	cout << "r = [";
-	for (int i = 0, i < n< ++i){
+	for (int i = 0; i < n; ++i){
 		cout << r[i] << " ";
 	}
-	cout "]" << endl;
+	cout << "]" << endl;
 	
 	cout << setprecision(4);
 	cout << "Rate of return of the portfolio: " << PortfolioReturn << endl;
 	
-	cout fixed << setprecision(2);
+	cout << fixed << setprecision(2);
 	cout << "V:" << V << endl;
 }
 
 void scriviFile(const char* filename, double S, int n, const double w[], const double r[], double PortfolioReturn, double V){
 	ofstream outFile(filename);
-	if(!outfile.is_open())
-		return true;
+	if(!outFile.is_open()) return;
 	
 	outFile << fixed << setprecision(2);
 	outFile << "S =" << S << ", n = " << n << endl;
 	
 	outFile << "w = [ " ;
-	for (int i = 0, i < n, ++i){
+	for (int i = 0; i < n; ++i){
 		outFile << w[i] << " ";
 	}
 	outFile << "]" << endl;
 	
 	outFile << "r = [ ";
-	for(int i = 0, i < n, ++i){
+	for(int i = 0; i < n; ++i){
 		outFile << r[i] << " ";
 	}
 	outFile << "]" << endl;
@@ -105,5 +103,5 @@ void scriviFile(const char* filename, double S, int n, const double w[], const d
 
 	outFile.close();
 
-	return true;
+	return;
 }
